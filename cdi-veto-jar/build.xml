@@ -1,0 +1,35 @@
+<project name="install-cdi-veto-jar" default="all" >
+
+    <property environment="ENV"/>
+	<property name="module.path" value="${ENV.JBOSSBPM_HOME}/modules/system/layers" />
+	<property name="aimco.module.path" value="${module.path}/aimco" />
+	<taskdef name="jandex" classname="org.jboss.jandex.JandexAntTask" classpath="${ENV.JBOSSBPM_HOME}/modules/system/layers/base/org/jboss/jandex/main/jandex-1.0.3.Final-redhat-2.jar" />
+    <target name="all" >
+        <echo message="***** EAP6 Home :  ${ENV.JBOSSBPM_HOME}"/>
+        <antcall target="clean" />
+ 		       <antcall target="filter">
+		            <param name="source.dir" value="conf/jboss/"/>
+    		        <param name="dest.dir" value="${module.path}"/>
+        		</antcall>
+                <copy file="target/jboss-as-cdi-veto-jar.jar" todir="${aimco.module.path}/org/jboss/as/quickstarts/cdi-veto/main" overwrite="true" />
+                <jandex run="true" verbose="false" modify="true">
+					<fileset dir="${aimco.module.path}/org/jboss/as/quickstarts/cdi-veto/main" />
+				</jandex>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build.dir}" />
+    </target>
+    
+    <target name="filter">
+        <fail unless="source.dir" message="filter:  need to pass 'source.dir' property" />
+        <fail unless="dest.dir" message="filter:  need to pass 'dest.dir' property" />
+               <copy toDir="${dest.dir}" overwrite="true" verbose="false" preservelastmodified="true">
+                    <fileset dir="${source.dir}" />
+                    <filterchain>
+                        <expandproperties/>
+                    </filterchain>
+                </copy>
+    </target>
+
+</project>
